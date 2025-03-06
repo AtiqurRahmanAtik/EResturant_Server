@@ -189,6 +189,24 @@ async function run() {
       const result = await AddToCardCollection.insertOne(card);
       res.send(result);
     })
+    
+    // get add to card data here
+    app.get('/card/get', async(req,res)=>{
+      const card = AddToCardCollection.find();
+      const result = await card.toArray();
+      
+      res.send(result);
+    })
+
+    app.delete('/card/get/:id',async(req,res)=>{
+      const id = req.params.id;
+      console.log(id)
+      const quary = {_id: new ObjectId(id)};
+     
+      const result = await AddToCardCollection.deleteOne(quary);
+    
+      res.send(result);
+    })
 
       
     // Demo Api
