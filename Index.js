@@ -59,6 +59,8 @@ async function run() {
 
      const RegisterUserCollection = client.db('CURD_Server').collection('registerUser');
 
+     const AddToCardCollection = client.db('CURD_Server').collection('addCard');
+
 
    
 
@@ -151,10 +153,22 @@ async function run() {
 
      
 
-      const users = await UserCollection.find().sort({rating:1})
+      const users = await UserCollection.find().sort({rating:1});
       const cursor = await users.toArray();
       res.send(cursor);
     })
+
+
+    // show big price 
+    app.get('/bigPice', async(req,res)=> {
+
+     
+
+      const users = await UserCollection.find();
+      const cursor = await users.toArray();
+      res.send(cursor);
+    })
+
 
     app.get('/user/:id', async(req,res)=>{
       const id = req.params.id;
@@ -166,6 +180,14 @@ async function run() {
 
       res.send(result);
       
+    })
+
+    // Shoping Card or Add to Card Api post here
+    app.post('/card/post', async(req,res)=>{
+      // const card = req.body;
+      console.log(card);
+      const result = await AddToCardCollection.insertOne(card);
+      res.send(result);
     })
 
       
