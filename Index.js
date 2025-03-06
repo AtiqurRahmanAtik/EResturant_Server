@@ -184,9 +184,9 @@ async function run() {
 
     // Shoping Card or Add to Card Api post here
     app.post('/card/post', async(req,res)=>{
-      // const card = req.body;
-      console.log(card);
-      const result = await AddToCardCollection.insertOne(card);
+      const { _id, ...cardData } = req.body;
+      // console.log(card);
+      const result = await AddToCardCollection.insertOne(cardData);
       res.send(result);
     })
     
@@ -200,7 +200,7 @@ async function run() {
 
     app.delete('/card/get/:id',async(req,res)=>{
       const id = req.params.id;
-      console.log(id)
+      // console.log(id)
       const quary = {_id: new ObjectId(id)};
      
       const result = await AddToCardCollection.deleteOne(quary);
