@@ -67,8 +67,9 @@ async function run() {
 
       
     // Get data From mongodb 
-    app.get('/user', async(req,res)=>{
+    app.get('/product', async(req,res)=>{
         const users = await UserCollection.find();
+
     
         const cursor = await users.toArray();
 
@@ -153,7 +154,7 @@ async function run() {
 
      
 
-      const users = await UserCollection.find().sort({rating:1});
+      const users = await UserCollection.find().sort({Ratings:1});
       const cursor = await users.toArray();
       res.send(cursor);
     })
@@ -170,7 +171,7 @@ async function run() {
     })
 
 
-    app.get('/user/:id', async(req,res)=>{
+    app.get('/product/:id', async(req,res)=>{
       const id = req.params.id;
       // console.log('id is : ',id);
     
