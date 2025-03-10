@@ -4,9 +4,9 @@ const port = process.env.PORT || 5000;
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-
 
 // MiddleWare
 app.use(cors
@@ -20,16 +20,10 @@ app.use(cors
 );
 
 
-
 app.use(express.json());
-app.use(cookieParser());
 
 
-const createSecretToken = (email) => {
-  return jwt.sign({ email }, process.env.TOKEN_KEY, {
-    expiresIn: 3 * 24 * 60 * 60,
-  });
-};
+
 
 
 
@@ -77,35 +71,42 @@ async function run() {
     })
 
     // RegisterUser Post api from register from
-    app.post('/register', async(req,res)=>{
-      const users = req.body;
-      console.log(users);
-     
-      const existingUser = await RegisterUserCollection.findOne({ email});
-      if(existingUser){
-        return res.json({ message: "User already exists" });
+    app.post('/register', async (req, res) => {
+
+      const { name, email, password } = req.body;
+      
+  
+      try {
+          // Check if user already exists
+          const user = await RegisterUserCollection.findOne({email});
+         
+  
+          if (user) {
+              return res.status(400).send('User already registered');
+          }
+  
+          // Hash the password
+          const hashPassword = await bcrypt.hash(password, 12);
+  
+          // Insert the new user into the database
+          const result = await RegisterUserCollection.insertOne({ name, email, password: hashPassword });
+  
+         
+
+         const token = jwt.sign({email} ,process.env.JWT_TOKEN, { expiresIn: '1h' } );
+
+         res.cookie('token', token);
+
+         res.status(201).send({'result': result, 'token' : token});
+      } catch (error) {
+          console.error(error);
+          res.status(500).send('Internal Server Error');
       }
+  });
 
-     
-      const result = await RegisterUserCollection.insertOne(users);
-      // crete token here
-      const token = createSecretToken(result.email);
-      console.log('token : ', token);
-
-      res.cookie('token', token,{
-        withCredentials: true,
-        httpOnly: false,
-      });
-
-      res
-      .status(201)
-      .json({ message: "User signed in successfully", success: true, result });
-
-      res.send(result);
-
-    }) 
 
     app.get('/register', async(req,res)=>{
+
       const users = await RegisterUserCollection.find();
       const result = await users.toArray();
 
